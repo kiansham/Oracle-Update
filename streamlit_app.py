@@ -1,26 +1,25 @@
 import pandas as pd
 import streamlit as st
+import os
 import plotly.graph_objects as go
 import plotly.express as px
 from streamlit_echarts import st_echarts
 from streamlit_option_menu import option_menu
 from streamlit_server_state import server_state, server_state_lock
-from utils import create_filters, get_filtered_data, format_dataframe, display_columns, calculate_stats, calculate_metrics, SDG_Impact_Alignment, selected_score, create_radar_chart, create_strip_plot, generate_chart, create_company_selectbox, create_gauge_options, sdg_expander, find_closest_match, plot_choropleth
+from utils import intro_page, create_filters, get_filtered_data, format_dataframe, display_columns, calculate_stats, bullet, SDG_Impact_Alignment, selected_score, create_radar_chart, create_strip_plot, generate_chart, create_company_selectbox, create_gauge_options, sdg_expander, find_closest_match, plot_choropleth
 from st_aggrid import GridOptionsBuilder, AgGrid
 from st_aggrid.shared import GridUpdateMode, DataReturnMode
 
+
+##loading and setting up stuff
 st.set_page_config(
     page_title="Oracle Partnerships with Purpose Filtering", 
     page_icon="mag", 
     layout="wide", 
     initial_sidebar_state="expanded")
 
-def format_dataframe(df, display_columns):
-    df = df[display_columns]
-    new_column_names = {col: col.replace('Sdg', 'SDG') for col in df.columns if 'Sdg' in col}
-    df.rename(columns=new_column_names, inplace=True)
-    df['B Corp'] = df['B Corp'].replace({1: 'Yes', 0: 'No'})
-    return df
+
+    
 def load_data():
     try:
         df = pd.read_csv('oraclecomb2.csv')
@@ -29,69 +28,17 @@ def load_data():
     df = format_dataframe(df, display_columns)
     return df
 
-def edit(df):
-    gb = GridOptionsBuilder.from_dataframe(df)
-    for col in df.columns:
-        gb.configure_column(col, hide=col not in display_columns)
-    gridOptions = gb.build()
-    gridOptions['enableRangeSelection'] = True
-    dta = AgGrid(df, gridOptions=gridOptions, height=200, editable=True, theme="streamlit", data_return_mode=DataReturnMode.AS_INPUT, update_mode=GridUpdateMode.MODEL_CHANGED)
-    edited_df = dta['data']
-    edited_df.to_csv('oraclecomb2.csv', index=False)
-    if 'oraclecomb2.csv' in df:
-        st.warning('You are using an edited source document.')
-    return edited_df
-
-
-##function for IntroPage Text Wall
-def intro_page():
-    col1 , col2 = st.columns(2)
-    with col1:
-        st.subheader("Oracle Tool: Introduction")
-        st.markdown(f'###### Welcome! :wave:')
-        st.markdown('This Tool has been designed to assist Oracle in Filtering through potential corporate partners.\n\n'
-            'It contains over 6,000 companies and assesses them based on our 4 C Framework represented by the **Oracle Score** and its subcomponents the\n\n'
-              '**- Culture Score** **- Capactiy Score** **- Conduct Score** **- Collaboration Score**.')
-        st.divider()
-        st.subheader('Things to Note')
-        st.markdown('The Oracle Score is an estimation and the scores should merely give a guide to companies that may be useful to reach out to.\n\n'
-                    'Please note that navigating between pages will reset the view while navigating between tabs will keep the filters intact.\n\n' 
-                    'If an error occurs it is likely interaction between different filters. Please reset filters and try again.\n\n'
-            ':black_circle_for_record: **To better Understand terminology, data sources or calcultations used, please refer to the additional tabs above this page** :top:.\n\n')
-        st.markdown('We are working to provide complete background information as downloadables and through visualisation in the app. We are also refactoring code and will will update Oracle when available')
-    with col2:
-        st.subheader('Navigation')
-        st.markdown(f'###### Where do you want to go? :wave:\n\n'           
-                '**To Get Started** :page_facing_up: Use the **sidebar** on the left of the page to start exploring.')
-
-        st.markdown('Navigate between one of two main sections:\n\n'
-                ':one: **Aggregate Data** :bar_chart: :mag:\n\n'
-                'Consists of two embedded tabs. In this section you can filter the database based on a number of different criteria. Data will automatically update as you adjust the filter values. Tables are editable and downloadable.'
-                'This section also contains a number of charts and statistics to help you understand the data shapre & distribution giving users chance to break down the Oracle Score in to its subcomponents.'
-                'This page is useful for giving users a well rounded view of the universe!\n\n'
-                
-                ':two: **Company Deep Dive** :factory::eyes:\n\n' 
-                'The page allows us to select a company from the dropdown and see a detailed overview of the company including performance on our 4Cs framework.' 
-                'Users can assess a Company performance across scores relative to a selected peer or the median of the universe.' 
-                'Lastly, users are shown a visual of company contribution to SDGs.' 
-                'This page is useful for understanding why a Company is rated as they are, what they might have in common with Oracle and is a launchpad to further research. \n\n')
-
 
 def aggframe(): 
     st.subheader("Oracle Score Dashboard")
     st.markdown('Use the Filters Below to Dynamically Narrow the Data Universe of Companies')
-    def load_data():
-        try:
-            df = pd.read_csv('oraclecomb2.csv')
-        except FileNotFoundError:
-            df = pd.read_csv('oraclecomb.csv')
-        return df
     df = load_data()
+    st.session_state["updated_df"] = st.data_editor(st.session_state['initial_df'], num_rows= 'dynamic')
+    print(df)
     filters = create_filters(df)    
-    filtered_data = get_filtered_data(df, *filters)
+    filtered_data = get_filtered_data(df, *filters).sort_values(by='Oracle Score', ascending=False)
     st.session_state['filtered_data'] = filtered_data    
     stats = calculate_stats(df, filtered_data, selected_score)
-    print(filtered_data)
     st.markdown('Stats for Current Filtered Universe')  
     col1, col2, col3, col4 = st.columns(4)
     col1.metric(label="Total Companies", value=f"{stats['total_filtered_companies']:,}")
@@ -102,21 +49,24 @@ def aggframe():
     with col1:
         st.subheader('Data Table')
     with col2:
-        filtered_df={}
         edit_option = st.toggle('Edit Data', value = False)
-        if edit_option:
-            edited_df = edit(filtered_df)
-            st.subheader('Edited Data Table')
-            AgGrid(edited_df)  
+    if edit_option:
+        with st.form(key='my_form'):
+            st.markdown('Please Enter Your Edits on the Table and Click Submit')
+            df = st.data_editor(st.session_state['df'], hide_index=True)
+            submitted = st.form_submit_button(label="Submit")
+            if submitted:
+                st.write("Edited dataframe:", st.session_state['df']) 
+                st.warning('You are using an edited source document.')
     with col3:
         reset_option = st.toggle('Delete Edits', value=False)
         if reset_option:
             df = pd.read_csv('oraclecomb.csv')
             df.to_csv('oraclecomb2.csv', index=False)
             st.sidebar.success('Data has been reset to original source.')
-    filtered_df = filtered_data.sort_values(by='Oracle Score', ascending=False)
-    filtered_df = format_dataframe(filtered_df, display_columns)
-    st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+    
+    st.dataframe(filtered_data, use_container_width=True, hide_index=True)
+   
     col1, col2 = st.columns([6,3])
     with col2:
         csv = filtered_data.to_csv(index=False)
@@ -125,6 +75,7 @@ def aggframe():
             data=csv,
             file_name='oraclecombfiltered.csv',
             mime='text/csv')
+        
 def analysis1():
     df = load_data()
     filtered_data = st.session_state['filtered_data']
@@ -157,66 +108,30 @@ def analysis1():
     st.plotly_chart(swarm_plot)
     st.divider()
     st.subheader(f'Mean, Median, Highest and Lowest Score on {selected_score}')
-    metrics = filtered_data[selected_score].describe()
-    max_score = metrics['max']
-    min_score = metrics['min']
-    median_score = metrics['50%']
-    mean_score = metrics['mean']
+    stats = calculate_stats(df, filtered_data, selected_score)
     col1, col2, col3 = st.columns([1,1.5,4])
     with col1:
-        st.metric(label="Median", value=f"{median_score:.2f}", delta ="None", delta_color="off")
-        st.metric(label="Mean", value=f"{mean_score:.2f}", delta =f"{mean_score - median_score:.2f}")
-        st.metric(label="Highest Score", value=f"{max_score:.2f}", delta =f"{max_score - median_score:.2f}")
-        st.metric(label="Lowest Score", value=f"{min_score:.2f}", delta =f"{min_score - median_score:.2f}")
+        st.metric(label="Median", value=f"{stats['median_score']:.2f}", delta ="None", delta_color="off")
+        st.metric(label="Mean", value=f"{stats['mean_score']:.2f}", delta =f"{stats['mean_score'] - stats['median_score']:.2f}")
+        st.metric(label="Highest Score", value=f"{stats['max_score']:.2f}", delta =f"{stats['max_score'] - stats['median_score']:.2f}")
+        st.metric(label="Lowest Score", value=f"{stats['min_score']:.2f}", delta =f"{stats['min_score'] - stats['median_score']:.2f}")
     with col2:
-        metrics = calculate_metrics(filtered_data, selected_score)
-        industry_median_scores, highest_industry, highest_company, lowest_industry, lowest_company = metrics
         st.text('Highest Industry (by median):')
-        st.markdown(f'##### {highest_industry}')   
+        st.markdown(f'##### {stats["highest_industry"]}')   
         st.markdown("")
         st.markdown("")
         st.text('Highest Company:')
-        st.markdown(f'##### {highest_company}')   
+        st.markdown(f'##### {stats["highest_company"]}')   
         st.markdown("")
         st.markdown("")
         st.text('Lowest Industry (by median):')
-        st.markdown(f'##### {lowest_industry}') 
+        st.markdown(f'##### {stats["lowest_industry"]}') 
         st.markdown("")
         st.markdown("")
         st.text('Lowest Company:')
-        st.markdown(f'##### {lowest_company}')
+        st.markdown(f'##### {stats["lowest_company"]}')
     with col3:
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=[min_score, median_score, mean_score, max_score],
-            y=[selected_score]*4,
-            text=['Min', 'Median', 'Mean', 'Max'],
-            mode='markers+text',
-            textposition="top center",
-            marker=dict(color=['blue', 'red', 'green', 'orange'], size=10),
-            showlegend=False
-        ))
-
-        fig.update_layout(
-            shapes=[
-                dict(type="line", xref="x", yref="y",
-                    x0=min_score, y0=-0.25, x1=min_score, y1=0.25,
-                    line=dict(color="blue", width=3)),
-                dict(type="line", xref="x", yref="y",
-                    x0=median_score, y0=-0.25, x1=median_score, y1=0.25,
-                    line=dict(color="red", width=3)),
-                dict(type="line", xref="x", yref="y",
-                    x0=mean_score, y0=-0.25, x1=mean_score, y1=0.25,
-                    line=dict(color="green", width=3)),
-                dict(type="line", xref="x", yref="y",
-                    x0=max_score, y0=-0.25, x1=max_score, y1=0.25,
-                    line=dict(color="orange", width=3)),
-            ],
-            xaxis=dict(range=[min_score - 5, max_score + 5], autorange=False),
-            yaxis=dict(showticklabels=False, range=[-0.5, 0.5]),
-            title=f"Bullet Chart: Min, Max, Median, and Mean for {selected_score}"
-        )
-        st.plotly_chart(fig)
+        bullet(filtered_data, stats, selected_score)
 
     st.subheader(f"{selected_score} by Industry")
     st.markdown(f'This chart shows the Average Scores across Industries for {selected_score}.  Each industry type is colour coded.')          
@@ -224,7 +139,6 @@ def analysis1():
     generate_chart(df, stats, selected_score, "industry")
     filtered_data2 = df.groupby('Country').filter(lambda x: len(x) > 20)
     score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score']
-    stats = calculate_stats(df, filtered_data, selected_score)
     st.subheader(f'{selected_score} Coverage: Regional Concentrations')
     col1, col2, col3 = st.columns([1, 2, 1.5], gap='small')
     with col1:
@@ -235,13 +149,12 @@ def analysis1():
             country_counts = filtered_data2['Country'].value_counts().reset_index()
             country_counts.columns = ['Country', 'count']
             df = filtered_data2.groupby('Country').filter(lambda x: len(x) > 20)
-            country_metrics_data = calculate_stats(df, filtered_data2, selected_score)
             st.markdown('')
-            st.metric(label="UK Companies Rated", value=f"{country_metrics_data['total_uk_companies']:,}")
+            st.metric(label="UK Companies Rated", value=f"{stats['total_uk_companies']:d}")
             st.markdown('')
-            st.metric(label="Average UK Company Score", value=f"{country_metrics_data['uk_avg_score']:.2f}")
+            st.metric(label="Average UK Company Score", value=f"{stats['uk_avg_score']:.2f}")
             st.markdown('')
-            st.metric(label="Region With Most Companies Rated", value=f"{country_metrics_data['most_companies_country']} - {country_metrics_data['most_companies_count']:,}")
+            st.metric(label="Region With Most Companies Rated", value=f"{stats['most_companies_country']} - {stats['most_companies_count']:,}")
     with col2:
         st.plotly_chart(plot_choropleth(country_counts))
     avg_scores = filtered_data2.groupby('Country')[selected_score].mean().round(2).reset_index()
@@ -289,7 +202,7 @@ def deepdive():
         conduct_delta = float(company_data['Conduct Score'].iloc[0]) - df['Conduct Score'].median()
         collaboration_delta = float(company_data['Collaboration Score'].iloc[0]) - df['Collaboration Score'].median()
         st.metric("Culture Score", "{:.2f}".format(company_data['Culture Score'].iloc[0]), "{:.2f}".format(culture_delta))
-        st.markdown("")
+        st.markdown("") #note to self format these better
         st.markdown("")
         st.markdown("")
         st.markdown("")
@@ -448,8 +361,7 @@ def show_menu(menu):
             menu_selection = option_menu(**kwargs)
     elif with_view_panel == 'main':
         menu_selection = option_menu(**kwargs)
-    else:
-        raise ValueError(f"Unknown view panel value: {with_view_panel}. Must be 'sidebar' or 'main'.")
+
 
     if menu['items'][menu_selection]['submenu']:
         show_menu(menu['items'][menu_selection]['submenu'])

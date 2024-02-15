@@ -52,8 +52,8 @@ def load_data(file_path, display_columns):
         print(f"File {file_path} not found.")
     except Exception as e:
         print(f"An error occurred: {e}")
-vpth = r'C:\Users\kianj\Python\Oracle\streamlit_app\oraclecomb.csv'
-df = load_data(vpth, display_columns)
+file = "oraclecomb.csv"
+df = load_data(file, display_columns)
 
 
 
@@ -107,8 +107,7 @@ def get_filtered_data(df, b_corp_filtered, selected_companies, selected_regions,
     filtered_data = filter_dataframe(df, b_corp_filtered, selected_companies, selected_regions, selected_industries, selected_size, selected_oracle, selected_culture, selected_capacity, selected_conduct, selected_collaboration)
     return filtered_data
 
-
-###Score Checking
+###Create all the metrics
 company_data  = None
 score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score'] 
 selected_score = "Oracle Score"
@@ -141,6 +140,15 @@ def calculate_stats(df, filtered_data, selected_score):
     region_counts = df['Region'].value_counts()
     regions = region_counts.index.tolist()
     region_country_counts = df.groupby(['Region', 'Country']).size().unstack(fill_value=0).reset_index()
+    industry_median_scores = df.groupby('Industry')[selected_score].median()
+    highest_industry = industry_median_scores.idxmax()
+    lowest_industry = industry_median_scores.idxmin()
+    max_score = df[selected_score].max()
+    min_score = df[selected_score].min()
+    median_score = df[selected_score].median()
+    mean_score = df[selected_score].mean()
+    highest_company = df[df[selected_score] == max_score]['Company'].values[0]
+    lowest_company = df[df[selected_score] == min_score]['Company'].values[0]
     return {
         "total_companies": total_companies,
         "most_companies_country": most_companies_country,
@@ -165,8 +173,56 @@ def calculate_stats(df, filtered_data, selected_score):
         "average_scores_size": average_scores_size,
         "overall_average_industry": overall_average_industry,
         "overall_average_region": overall_average_region,
-        "overall_average_size": overall_average_size}
+        "overall_average_size": overall_average_size,
+        "region_counts": region_counts,
+        "regions": regions,
+        "industry_median_scores": industry_median_scores,
+        "highest_industry": highest_industry,
+        "max_score": max_score,
+        "min_score": min_score,
+        "median_score": median_score,
+        "mean_score": mean_score,
+        "lowest_industry": lowest_industry,
+        "highest_company": highest_company,
+        "lowest_company": lowest_company}
 
+print(df)
+#bullet chart
+def bullet(filtered_data, stats, selected_score): 
+    stats = calculate_stats(df, filtered_data, selected_score)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=[stats['min_score'], stats['median_score'], stats['mean_score'], stats['max_score']],
+        y=[selected_score]*4,
+        text=['Min', 'Median', 'Mean', 'Max'],
+        mode='markers+text',
+        textposition="top center",
+        marker=dict(color=['blue', 'red', 'green', 'orange'], size=10),
+        showlegend=False
+    ))
+
+    fig.update_layout(
+        shapes=[
+            dict(type="line", xref="x", yref="y",
+                x0=stats['min_score'], y0=-0.25, x1=stats['min_score'], y1=0.25,
+                line=dict(color="blue", width=3)),
+            dict(type="line", xref="x", yref="y",
+                x0=stats['median_score'], y0=-0.25, x1=stats['median_score'], y1=0.25,
+                line=dict(color="red", width=3)),
+            dict(type="line", xref="x", yref="y",
+                x0=stats['mean_score'], y0=-0.25, x1=stats['mean_score'], y1=0.25,
+                line=dict(color="green", width=3)),
+            dict(type="line", xref="x", yref="y",
+                x0=stats['max_score'], y0=-0.25, x1=stats['max_score'], y1=0.25,
+                line=dict(color="orange", width=3)),
+        ],
+        xaxis=dict(range=[stats['min_score'] - 5, stats['max_score'] + 5], autorange=False),
+        yaxis=dict(showticklabels=False, range=[-0.5, 0.5]),
+        title=f"Bullet Chart for {selected_score}"
+    )
+    st.plotly_chart(fig)
+
+##make a couple of bar charts
 def generate_chart(filtered_data, stats, selected_score, chart_type):
     stats = {}
     stats[selected_score] = calculate_stats(df, filtered_data, selected_score)
@@ -206,7 +262,8 @@ def generate_chart(filtered_data, stats, selected_score, chart_type):
                       annotation_position="top right" if chart_type != 'industry' else "bottom right")
 
     fig.update_layout(xaxis_title='', yaxis_title='', showlegend=False)    
-    st.plotly_chart(fig, use_container_width=True)##swarm chart
+    st.plotly_chart(fig, use_container_width=True)
+
 ##Create swarm chart
 def create_strip_plot(filtered_data, selected_score):
     swarm = px.strip(
@@ -236,7 +293,7 @@ def create_strip_plot(filtered_data, selected_score):
         orientation='h'))
     return swarm
 
-#company select
+#company selectbox for charting
 def create_company_selectbox(df, key):
     df_sorted = df.sort_values(by='Oracle Score', ascending=False)
     companies_sorted = df_sorted['Company'].unique()
@@ -252,16 +309,9 @@ def calculate_metrics(df, selected_score):
     selected_score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score'] 
     if selected_score not in selected_score_columns:
         return None
-    industry_median_scores = df.groupby('Industry')[selected_score].median()
-    highest_industry = industry_median_scores.idxmax()
-    lowest_industry = industry_median_scores.idxmin()
-    max_score = df[selected_score].max()
-    min_score = df[selected_score].min()
-    highest_company = df[df[selected_score] == max_score]['Company'].values[0]
-    lowest_company = df[df[selected_score] == min_score]['Company'].values[0]
-    return industry_median_scores, highest_industry, highest_company, lowest_industry, lowest_company
+    return 
 
-#more checking
+#Clean messy country naming
 def find_closest_match(country, recognized_countries):
     scores = [Levenshtein.ratio(country.lower(), mapped_country.lower()) for mapped_country in recognized_countries]
     max_index = scores.index(max(scores))
@@ -270,6 +320,7 @@ def find_closest_match(country, recognized_countries):
         return recognized_countries[max_index]
     else:
         return country
+    
 @st.cache_data
 def calculate_country_metrics(df, selected_country='United Kingdom'):
     if 'Country' not in df.columns:
@@ -326,13 +377,13 @@ def create_gauge_chart(score, median_oracle_score, title):
     fig = go.Figure(go.Indicator(
         mode="gauge+number+delta",
         value=score,
-        delta={'reference': median_oracle_score},  # Show the difference from the median score
+        delta={'reference': median_oracle_score}, #THIS IS NOT WORKING
         title={'text': title},
         domain={'x': [0, 1], 'y': [0, 1]},
         gauge={
             'axis': {'range': [None, 100], 'tickwidth': 1},
             'bar': {'color': "darkblue"},
-            'steps': [{'range': [0, median_oracle_score], 'color': 'lightgray'}]  # Show the median score on the gauge
+            'steps': [{'range': [0, median_oracle_score], 'color': 'lightgray'}]  # AND THIS
         }))
     fig.update_layout(width=400, height=300)
     return fig
@@ -393,6 +444,7 @@ def create_gauge_options(score, median_oracle_score, title):
             }]
         }
         return options
+
 ##create radar chart
 def create_radar_chart(df, scores, score_columns, selected_company, option, show_median=False, show_comparison=False):
     radar_data = pd.DataFrame(dict(Score=scores, Dimension=score_columns))
@@ -431,6 +483,7 @@ def create_radar_chart(df, scores, score_columns, selected_company, option, show
             xanchor="left",
             x=0))
     return fig
+
 ##function for Text on SDG_Expander
 def sdg_expander():
     with st.expander('Click To Expand For More Information on Complete SDG Definitions and Revenue Alignment Methodology :world_map:'):
@@ -496,8 +549,8 @@ def create_sdg_chart(df, show_all_data):
                 name=f'SDG {i} Alignment',
                 orientation='h',
                 marker_color=colors[i % len(colors)],
-                text=[f'SDG {i} Aligned: {aligned_value*100:.2f}%' if aligned_value != 0 else ''],  # Conditionally include SDG in the text
-                textposition='outside'  # Display the text outside the bars
+                text=[f'SDG {i} Aligned: {aligned_value*100:.2f}%' if aligned_value != 0 else ''],
+                textposition='outside'
             ), 1, 2)
             fig.add_trace(go.Bar(
                 y=[f'SDG {i}'],
@@ -539,5 +592,36 @@ def SDG_Impact_Alignment(df, option):
     st.markdown(f"#### Plotted Revenue Alignment/Misalignment to SDGs")
     st.plotly_chart(fig)
 
+def intro_page():
+    col1 , col2 = st.columns(2)
+    with col1:
+        st.subheader("Oracle Tool: Introduction")
+        st.markdown(f'###### Welcome! :wave:')
+        st.markdown('This Tool has been designed to assist Oracle in Filtering through potential corporate partners.\n\n'
+            'It contains over 6,000 companies and assesses them based on our 4 C Framework represented by the **Oracle Score** and its subcomponents the\n\n'
+              '**- Culture Score** **- Capactiy Score** **- Conduct Score** **- Collaboration Score**.')
+        st.divider()
+        st.subheader('Things to Note')
+        st.markdown('The Oracle Score is an estimation and the scores should merely give a guide to companies that may be useful to reach out to.\n\n'
+                    'Please note that navigating between pages will reset the view while navigating between tabs will keep the filters intact.\n\n' 
+                    'If an error occurs it is likely interaction between different filters. Please reset filters and try again.\n\n'
+            ':black_circle_for_record: **To better Understand terminology, data sources or calcultations used, please refer to the additional tabs above this page** :top:.\n\n')
+        st.markdown('We are working to provide complete background information as downloadables and through visualisation in the app. We are also refactoring code and will will update Oracle when available')
+    with col2:
+        st.subheader('Navigation')
+        st.markdown(f'###### Where do you want to go? :wave:\n\n'           
+                '**To Get Started** :page_facing_up: Use the **sidebar** on the left of the page to start exploring.')
+
+        st.markdown('Navigate between one of two main sections:\n\n'
+                ':one: **Aggregate Data** :bar_chart: :mag:\n\n'
+                'Consists of two embedded tabs. In this section you can filter the database based on a number of different criteria. Data will automatically update as you adjust the filter values. Tables are editable and downloadable.'
+                'This section also contains a number of charts and statistics to help you understand the data shapre & distribution giving users chance to break down the Oracle Score in to its subcomponents.'
+                'This page is useful for giving users a well rounded view of the universe!\n\n'
+                
+                ':two: **Company Deep Dive** :factory::eyes:\n\n' 
+                'The page allows us to select a company from the dropdown and see a detailed overview of the company including performance on our 4Cs framework.' 
+                'Users can assess a Company performance across scores relative to a selected peer or the median of the universe.' 
+                'Lastly, users are shown a visual of company contribution to SDGs.' 
+                'This page is useful for understanding why a Company is rated as they are, what they might have in common with Oracle and is a launchpad to further research. \n\n')
 
 
