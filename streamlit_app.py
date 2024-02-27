@@ -285,7 +285,6 @@ def deepdive():
     with colz:
         if company_data is not None and 'B Corp' in company_data.columns:
             b_corp_status = "Certified B Corp" if company_data['B Corp'].iloc[0] == 'Yes' else "Not a Certified B Corp"
-            st.markdown("B Corp Status")
         st.markdown(f'B Corp Status')
         st.markdown(f"###### {b_corp_status}")
     st.markdown(f"###### Description")
