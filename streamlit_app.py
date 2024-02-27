@@ -57,11 +57,10 @@ def create_sidebar_components():
             df = pd.read_csv(file_path)
             df.to_csv(file_path, index = False)
         file_use(file_path)
-
+@st.cache_data
 def aggframe():
     st.subheader("Oracle Score Dashboard")
     st.markdown('Use the Filters Below to Dynamically Narrow the Data Universe of Companies')
-    @st.cache_data
     df = load_data(display_columns)
     filters = create_filters(df)    
     filtered_data = get_filtered_data(df, *filters).sort_values(by='Oracle Score', ascending=False)
