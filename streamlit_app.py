@@ -14,7 +14,7 @@ st.set_page_config(
     layout="wide", 
     initial_sidebar_state="expanded")
 
-@st.cache_data
+@st.cache_data(experimental_allow_widgets=True)
 def load_data(display_columns, file_path="oraclecomb.csv"):
     df = None
     try:
@@ -57,7 +57,7 @@ def create_sidebar_components():
             df = pd.read_csv(file_path)
             df.to_csv(file_path, index = False)
         file_use(file_path)
-@st.cache_data
+@st.cache_data(experimental_allow_widgets=True)
 def aggframe():
     st.subheader("Oracle Score Dashboard")
     st.markdown('Use the Filters Below to Dynamically Narrow the Data Universe of Companies')
