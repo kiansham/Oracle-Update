@@ -99,7 +99,7 @@ def aggframe():
         'SDG 13: Aligned', 'SDG 13: Misaligned',
         'SDG 14: Aligned', 'SDG 14: Misaligned',
         'SDG 15: Aligned', 'SDG 15: Misaligned', 
-        'Description', 'Website'], num_rows='dynamic', hide_index=True, use_container_width = False, width = 2500)  
+        'Description', 'Website'], hide_index=True, use_container_width = False, width = 2500)  
         col1, col2 = st.columns([6, 3])
         with col1: 
             st.markdown(f'###### Edit Table')
