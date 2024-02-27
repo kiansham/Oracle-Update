@@ -8,9 +8,6 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 from streamlit_echarts import st_echarts
 import Levenshtein
-from streamlit_option_menu import option_menu
-from streamlit_server_state import server_state, server_state_lock
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
 
 display_columns = ['Company', 'Country', 'Industry', 'Region',
             'Company Size', 'Employees (Estimate)','Public Or Private', 
