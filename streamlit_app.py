@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import os
+import time
 import plotly.graph_objects as go
 import plotly.express as px
 from streamlit_echarts import st_echarts
@@ -18,26 +19,55 @@ st.set_page_config(
     layout="wide", 
     initial_sidebar_state="expanded")
 
-
-    
-def load_data():
+def load_data(display_columns, file_path="oraclecomb.csv"):
+    df = None
     try:
-        df = pd.read_csv('oraclecomb2.csv')
+        df = pd.read_csv(file_path)
     except FileNotFoundError:
-        df = pd.read_csv('oraclecomb.csv')
-    df = format_dataframe(df, display_columns)
+        print(f"{file_path} not found.")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+    new_column_names = {col: col.replace('Sdg', 'SDG') for col in df.columns if 'Sdg' in col}
+    df.rename(columns=new_column_names, inplace=True)
+    df['B Corp'] = df['B Corp'].replace({1: 'Yes', 0: 'No'})
+    df = df[display_columns]
     return df
 
+def file_use(file_path):
+    if file_path == "oraclecomb2.csv":
+        st.sidebar.warning('Please note you are now using an editable data file')
+    elif file_path == "oraclecomb.csv":
+        st.sidebar.success('You are viewing the unchanged original data file')
 
-def aggframe(): 
+def select_data_source():
+    dataframe = {
+        "Original Data": "oraclecomb.csv",
+        "Edited Data": "oraclecomb2.csv"
+    }
+    return dataframe
+
+def create_sidebar_components():
+    with st.sidebar:
+        dataframe = select_data_source()
+        selected_dataframe = st.radio('Optional: Use an Original or Edited Data Source', list(dataframe.keys()), horizontal = True)
+        file_path = dataframe[selected_dataframe]
+        df = load_data(display_columns, file_path)
+        reset_option = None  # Initialize reset_option here
+        if selected_dataframe == 'Edited Data':
+            reset_option = st.checkbox(label = 'Reset Edits', help = 'Use the buttons below to Reset the file you are using. If using an edited file, reset option will revert to the last saved version of the edited file', key='reset_option')
+        if reset_option is not None:
+            df = pd.read_csv(file_path)
+            df.to_csv(file_path, index = False)
+        file_use(file_path)
+def aggframe():
     st.subheader("Oracle Score Dashboard")
     st.markdown('Use the Filters Below to Dynamically Narrow the Data Universe of Companies')
-    df = load_data()
-    st.session_state["updated_df"] = st.data_editor(st.session_state['initial_df'], num_rows= 'dynamic')
-    print(df)
+    df = load_data(display_columns)
     filters = create_filters(df)    
     filtered_data = get_filtered_data(df, *filters).sort_values(by='Oracle Score', ascending=False)
-    st.session_state['filtered_data'] = filtered_data    
+    st.session_state['filtered_data'] = filtered_data
     stats = calculate_stats(df, filtered_data, selected_score)
     st.markdown('Stats for Current Filtered Universe')  
     col1, col2, col3, col4 = st.columns(4)
@@ -45,40 +75,51 @@ def aggframe():
     col2.metric(label="UK Companies", value=f"{stats['total_filtered_uk_companies']:,}")
     col3.metric(label="Highest Oracle Score", value="{:.2f}".format(stats['highest_oracle_score']))
     col4.metric(label="Median Oracle Score", value="{:.2f}".format(stats['median_oracle_score']))
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.subheader('Data Table')
+    st.subheader('Data Table')
+    df = st.data_editor(df, column_order = ['Company', 'Country', 'Industry', 'Region',
+    'Company Size', 'Employees (Estimate)','Public Or Private', 
+    'Oracle Score', 'Culture Score', 
+    'Capacity Score', 'Conduct Score', 'Collaboration Score', 
+    'B Corp',  'SDG 1: Aligned', 'SDG 1: Misaligned',
+    'SDG 2: Aligned', 'SDG 2: Misaligned',
+    'SDG 3: Aligned', 'SDG 3: Misaligned',
+    'SDG 4: Aligned', 'SDG 4: Misaligned',
+    'SDG 5: Aligned', 'SDG 5: Misaligned',
+    'SDG 6: Aligned', 'SDG 6: Misaligned',
+    'SDG 7: Aligned', 'SDG 7: Misaligned',
+    'SDG 8: Aligned', 'SDG 8: Misaligned',
+    'SDG 9: Aligned', 'SDG 9: Misaligned',
+    'SDG 10: Aligned', 'SDG 10: Misaligned',
+    'SDG 11: Aligned', 'SDG 11: Misaligned',
+    'SDG 12: Aligned', 'SDG 12: Misaligned',
+    'SDG 13: Aligned', 'SDG 13: Misaligned',
+    'SDG 14: Aligned', 'SDG 14: Misaligned',
+    'SDG 15: Aligned', 'SDG 15: Misaligned', 
+    'Description', 'Website'], num_rows='dynamic', hide_index=True, use_container_width = False, width = 2500)  
+    col1, col2 = st.columns([6, 3])
+    with col1: 
+        st.markdown(f'###### Edit Table')
+        submitted = st.button('Submit') 
+        if submitted:
+            with st.spinner('Loading Data'):
+                time.sleep(2)
+                st.warning('Document Successfully Edited.')
+                df.to_csv('oraclecomb2.csv', index=False) 
+        st.markdown('Please Enter Your Edits on the Table and Click Submit')
+
     with col2:
-        edit_option = st.toggle('Edit Data', value = False)
-    if edit_option:
-        with st.form(key='my_form'):
-            st.markdown('Please Enter Your Edits on the Table and Click Submit')
-            df = st.data_editor(st.session_state['df'], hide_index=True)
-            submitted = st.form_submit_button(label="Submit")
-            if submitted:
-                st.write("Edited dataframe:", st.session_state['df']) 
-                st.warning('You are using an edited source document.')
-    with col3:
-        reset_option = st.toggle('Delete Edits', value=False)
-        if reset_option:
-            df = pd.read_csv('oraclecomb.csv')
-            df.to_csv('oraclecomb2.csv', index=False)
-            st.sidebar.success('Data has been reset to original source.')
-    
-    st.dataframe(filtered_data, use_container_width=True, hide_index=True)
-   
-    col1, col2 = st.columns([6,3])
-    with col2:
+        st.markdown(f'###### Download')
         csv = filtered_data.to_csv(index=False)
         st.download_button(
-            label="Download Displayed Data",
+            label="Download CSV",
             data=csv,
-            file_name='oraclecombfiltered.csv',
-            mime='text/csv')
+            file_name='filtered_data.csv'
+        )
+        st.markdown('To Download the Current Datatable Click Here')
+
         
 def analysis1():
-    df = load_data()
-    filtered_data = st.session_state['filtered_data']
+    df = load_data(display_columns, file_path= 'oraclecomb.csv')
     st.subheader('Select a Score Category to See its Distribution and the Top 5 Best Performing Companies')
     score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score']
     filtered_data = st.session_state['filtered_data']
@@ -131,10 +172,13 @@ def analysis1():
         st.text('Lowest Company:')
         st.markdown(f'##### {stats["lowest_company"]}')
     with col3:
+        filtered_data = st.session_state['filtered_data']
         bullet(filtered_data, stats, selected_score)
 
     st.subheader(f"{selected_score} by Industry")
     st.markdown(f'This chart shows the Average Scores across Industries for {selected_score}.  Each industry type is colour coded.')          
+    df = load_data(display_columns, file_path= 'oraclecomb.csv')
+    filtered_data = st.session_state['filtered_data']
     stats = calculate_stats(df, filtered_data, selected_score)
     generate_chart(df, stats, selected_score, "industry")
     filtered_data2 = df.groupby('Country').filter(lambda x: len(x) > 20)
@@ -176,7 +220,7 @@ def analysis1():
         )
 
 def deepdive():
-    df = load_data()
+    df = load_data(display_columns)
     st.subheader("Company Deep Dive")
     score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score']
     option = create_company_selectbox(df, "Company")  
@@ -272,7 +316,6 @@ def deepdive():
             st.plotly_chart(radar_chart)
 
     st.subheader(f'SDG Revenue Alignment - {option}')
-    sdg_expander()
     SDG_Impact_Alignment(df, option)
 
 styles = {
@@ -326,8 +369,16 @@ menu = {
                 'with_view_panel': 'main',
                 'orientation': 'horizontal',
                 'styles': styles
-            }
-        }
+                }
+        },     
+        'Edit Datafile' :{
+        'title': 'Sidebar',
+        'menu_icon': 'sidebar_icon',
+        'default_index': 0,
+        'with_view_panel': 'sidebar',
+        'orientation': 'vertical',
+        'styles': styles
+    }
     },
     'menu_icon': 'search',
     'default_index': 0,
@@ -336,9 +387,10 @@ menu = {
     'styles': styles
 }
 
+
 def show_menu(menu):
     def _get_options(menu):
-        options = list(menu['items'].keys())
+        options = [option for option in menu['items'].keys() if option != 'Edit Datafile']
         return options
 
     def _get_icons(menu):
@@ -370,4 +422,5 @@ def show_menu(menu):
         menu['items'][menu_selection]['action']()
 
 show_menu(menu)
+create_sidebar_components()
 st.write('Kian 2024. :gear: :mag: for Oracle.')
