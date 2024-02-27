@@ -16,21 +16,21 @@ display_columns = ['Company', 'Country', 'Industry', 'Region',
             'Company Size', 'Employees (Estimate)','Public Or Private', 
             'Oracle Score', 'Culture Score', 
             'Capacity Score', 'Conduct Score', 'Collaboration Score', 
-            'B Corp',  'Sdg 1: Aligned', 'Sdg 1: Misaligned',
-            'Sdg 2: Aligned', 'Sdg 2: Misaligned',
-            'Sdg 3: Aligned', 'Sdg 3: Misaligned',
-            'Sdg 4: Aligned', 'Sdg 4: Misaligned',
-            'Sdg 5: Aligned', 'Sdg 5: Misaligned',
-            'Sdg 6: Aligned', 'Sdg 6: Misaligned',
-            'Sdg 7: Aligned', 'Sdg 7: Misaligned',
-            'Sdg 8: Aligned', 'Sdg 8: Misaligned',
-            'Sdg 9: Aligned', 'Sdg 9: Misaligned',
-            'Sdg 10: Aligned', 'Sdg 10: Misaligned',
-            'Sdg 11: Aligned', 'Sdg 11: Misaligned',
-            'Sdg 12: Aligned', 'Sdg 12: Misaligned',
-            'Sdg 13: Aligned', 'Sdg 13: Misaligned',
-            'Sdg 14: Aligned', 'Sdg 14: Misaligned',
-            'Sdg 15: Aligned', 'Sdg 15: Misaligned', 
+            'B Corp',  'SDG 1: Aligned', 'SDG 1: Misaligned',
+            'SDG 2: Aligned', 'SDG 2: Misaligned',
+            'SDG 3: Aligned', 'SDG 3: Misaligned',
+            'SDG 4: Aligned', 'SDG 4: Misaligned',
+            'SDG 5: Aligned', 'SDG 5: Misaligned',
+            'SDG 6: Aligned', 'SDG 6: Misaligned',
+            'SDG 7: Aligned', 'SDG 7: Misaligned',
+            'SDG 8: Aligned', 'SDG 8: Misaligned',
+            'SDG 9: Aligned', 'SDG 9: Misaligned',
+            'SDG 10: Aligned', 'SDG 10: Misaligned',
+            'SDG 11: Aligned', 'SDG 11: Misaligned',
+            'SDG 12: Aligned', 'SDG 12: Misaligned',
+            'SDG 13: Aligned', 'SDG 13: Misaligned',
+            'SDG 14: Aligned', 'SDG 14: Misaligned',
+            'SDG 15: Aligned', 'SDG 15: Misaligned', 
             'Description', 'Website']
 
 def format_dataframe(df, display_columns):
@@ -40,20 +40,34 @@ def format_dataframe(df, display_columns):
     df['B Corp'] = df['B Corp'].replace({1: 'Yes', 0: 'No'})
     return df
 
-def load_data(file_path, display_columns):
+def select_data_source():
+    dataframe = {
+        "Original Data": "oraclecomb.csv",
+        "Edited Data": "oraclecomb2.csv"
+    }
+    return dataframe
+def load_data(display_columns, file_path="oraclecomb.csv"):
+    df = None
     try:
         df = pd.read_csv(file_path)
-        df = df[display_columns]
-        new_column_names = {col: col.replace('Sdg', 'SDG') for col in df.columns if 'Sdg' in col}
-        df.rename(columns=new_column_names, inplace=True)
-        df['B Corp'] = df['B Corp'].replace({1: 'Yes', 0: 'No'})
-        return df
     except FileNotFoundError:
-        print(f"File {file_path} not found.")
+        print(f"{file_path} not found.")
+        return None
     except Exception as e:
         print(f"An error occurred: {e}")
-file = "oraclecomb.csv"
-df = load_data(file, display_columns)
+        return None
+    new_column_names = {col: col.replace('Sdg', 'SDG') for col in df.columns if 'Sdg' in col}
+    df.rename(columns=new_column_names, inplace=True)
+    df['B Corp'] = df['B Corp'].replace({1: 'Yes', 0: 'No'})
+    df = df[display_columns]
+    return df
+
+dataframe = select_data_source()
+selected_dataframe = st.radio('Optional: Use an Original or Edited Data Source', list(dataframe.keys()), horizontal = True)
+file_path = dataframe[selected_dataframe]
+
+df = load_data(display_columns, file_path)
+st.dataframe(df)
 
 
 
@@ -111,6 +125,7 @@ def get_filtered_data(df, b_corp_filtered, selected_companies, selected_regions,
 company_data  = None
 score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score'] 
 selected_score = "Oracle Score"
+df = load_data(display_columns, file_path= 'oraclecomb.csv')
 def calculate_stats(df, filtered_data, selected_score):
     if selected_score not in df.columns:
         return None
@@ -186,7 +201,6 @@ def calculate_stats(df, filtered_data, selected_score):
         "highest_company": highest_company,
         "lowest_company": lowest_company}
 
-print(df)
 #bullet chart
 def bullet(filtered_data, stats, selected_score): 
     stats = calculate_stats(df, filtered_data, selected_score)
@@ -536,10 +550,10 @@ def create_sdg_chart(df, show_all_data):
             aligned_value = df[sdg_aligned_key].iloc[0]
             misaligned_value = df[sdg_misaligned_key].iloc[0]
             if aligned_value > largest_aligned_value:
-                largest_aligned_sdg = f'Sdg {i}'
+                largest_aligned_sdg = f'SDG {i}'
                 largest_aligned_value = aligned_value
             if misaligned_value > largest_misaligned_value:
-                largest_misaligned_sdg = f'Sdg {i}'
+                largest_misaligned_sdg = f'SDG {i}'
                 largest_misaligned_value = misaligned_value
             if not show_all_data and (aligned_value == 0 and misaligned_value == 0):
                 continue
@@ -561,7 +575,7 @@ def create_sdg_chart(df, show_all_data):
                 text=[f'SDG {i} Misaligned: {misaligned_value*100:.2f}%' if misaligned_value != 0 else ''],  
                 textposition='outside'  # Display the text outside the bars
             ), 1, 1)
-            sdg_labels = [f'Sdg {i}' for i in range(1, 16) if f'Sdg {i}: Aligned' in df.columns or f'Sdg {i}: Misaligned' in df.columns]
+            sdg_labels = [f'SDG {i}' for i in range(1, 16) if f'SDG {i}: Aligned' in df.columns or f'SDG {i}: Misaligned' in df.columns]
             fig.update_layout(showlegend=False,
         margin=dict(l=10, r=10, t=20, b=20),
         autosize=True,  
@@ -623,5 +637,4 @@ def intro_page():
                 'Users can assess a Company performance across scores relative to a selected peer or the median of the universe.' 
                 'Lastly, users are shown a visual of company contribution to SDGs.' 
                 'This page is useful for understanding why a Company is rated as they are, what they might have in common with Oracle and is a launchpad to further research. \n\n')
-
 
