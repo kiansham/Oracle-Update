@@ -1,15 +1,10 @@
-import pandas as pd
 import streamlit as st
-import os
+import pandas as pd
 import time
-import plotly.graph_objects as go
 import plotly.express as px
 from streamlit_echarts import st_echarts
 from streamlit_option_menu import option_menu
-from streamlit_server_state import server_state, server_state_lock
-from utils import intro_page, create_filters, get_filtered_data, format_dataframe, display_columns, calculate_stats, bullet, SDG_Impact_Alignment, selected_score, create_radar_chart, create_strip_plot, generate_chart, create_company_selectbox, create_gauge_options, sdg_expander, find_closest_match, plot_choropleth
-from st_aggrid import GridOptionsBuilder, AgGrid
-from st_aggrid.shared import GridUpdateMode, DataReturnMode
+from utils import intro_page, create_filters, get_filtered_data, display_columns, calculate_stats, bullet, SDG_Impact_Alignment, selected_score, create_radar_chart, create_strip_plot, generate_chart, create_company_selectbox, create_gauge_options, sdg_expander, find_closest_match, plot_choropleth
 
 
 ##loading and setting up stuff
@@ -19,6 +14,7 @@ st.set_page_config(
     layout="wide", 
     initial_sidebar_state="expanded")
 
+@st.cache_data
 def load_data(display_columns, file_path="oraclecomb.csv"):
     df = None
     try:
@@ -61,9 +57,11 @@ def create_sidebar_components():
             df = pd.read_csv(file_path)
             df.to_csv(file_path, index = False)
         file_use(file_path)
+
 def aggframe():
     st.subheader("Oracle Score Dashboard")
     st.markdown('Use the Filters Below to Dynamically Narrow the Data Universe of Companies')
+    @st.cache_data
     df = load_data(display_columns)
     filters = create_filters(df)    
     filtered_data = get_filtered_data(df, *filters).sort_values(by='Oracle Score', ascending=False)
@@ -184,7 +182,7 @@ def analysis1():
     filtered_data2 = df.groupby('Country').filter(lambda x: len(x) > 20)
     score_columns = ['Oracle Score', 'Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score']
     st.subheader(f'{selected_score} Coverage: Regional Concentrations')
-    col1, col2, col3 = st.columns([1, 2, 1.5], gap='small')
+    col1, col2, col3 = st.columns([0.8, 2, 1.4], gap='small')
     with col1:
             df_gapminder = px.data.gapminder()
             recognized_countries = df_gapminder['country'].unique()
