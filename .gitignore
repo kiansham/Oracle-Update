@@ -161,3 +161,7 @@ cython_debug/
 
 # Github
 .github/
+
+# Project files
+*.csv
+!oraclecomb.csv

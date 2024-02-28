@@ -92,18 +92,6 @@ def load_data(display_columns: list[str], file_path="oraclecomb.csv") -> pd.Data
     return df
 
 
-dataframe = select_data_source()
-selected_dataframe = st.radio(
-    "Optional: Use an Original or Edited Data Source",
-    list(dataframe.keys()),
-    horizontal=True,
-)
-file_path = dataframe[selected_dataframe]
-
-df = load_data(display_columns, file_path)
-st.dataframe(df)
-
-
 def filter_dataframe(
     df,
     b_corp_filter,
