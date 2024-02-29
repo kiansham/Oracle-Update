@@ -879,14 +879,13 @@ def externaldata():
                            """)
                     
                 st.markdown("""
-                            Note that we have access to the metric not the underlying assessments.
-                            
-                            While the data is used to calculate scores it is not currently displayed in the tool given low coverage so as not to be misleading.
-                            
                             ##### How is the data used in the tool?
+                            
                             Data is normalised between 0 and 1 when available. Companies without data are not penalised in the tool. 
                             Each pillar is used, if available, to complement the core building blocks in creating various components of the Oracle Score.
-
+                            Note that we have access to the metric not the underlying assessments.
+                            While the data is used to calculate scores it is not currently displayed in the tool given low coverage so as not to be misleading.
+                            
                             To learn more about Just Capital, visit [this link](https://justcapital.com/).""")
             
         if selected_data_source == 'Affiliations':                   
