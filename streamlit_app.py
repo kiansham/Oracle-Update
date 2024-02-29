@@ -18,6 +18,7 @@ st.set_page_config(
 
 from utils import (
     intro_page,
+    externaldata,
     create_filters,
     get_filtered_data,
     display_columns,
@@ -524,7 +525,7 @@ menu = {
                         "submenu": None,
                     },
                     "3rd Party Data Used": {
-                        "action": sdg_expander,
+                        "action": externaldata,
                         "item_icon": "database-dash",
                         "submenu": None,
                     },
