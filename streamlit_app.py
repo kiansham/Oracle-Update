@@ -19,6 +19,7 @@ st.set_page_config(
 from utils import (
     intro_page,
     externaldata,
+    propdata,
     create_filters,
     get_filtered_data,
     display_columns,
@@ -530,7 +531,7 @@ menu = {
                         "submenu": None,
                     },
                     "Proprietary Data Logic": {
-                        "action": "",
+                        "action": propdata,
                         "item_icon": "database-check",
                         "submenu": None,
                     },

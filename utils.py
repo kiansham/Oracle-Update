@@ -954,7 +954,7 @@ def externaldata():
     data_sources = ["B Corp Impact Assessments", "Upright Impact", "MIT Sloan Lab Culture", "Just Capital", "Affiliations"]
     st.markdown("""
     The app uses a variety of publicly available sources, namely:""")
-    col1, col2 = st.columns([1,4.5])
+    col1, col2 = st.columns([1,3])
     with col1:
         st.markdown("""
         - B Corp Impact Assessments
@@ -975,7 +975,7 @@ def externaldata():
 
                 Lastly, **Affiliations** dataset is a webscraped.csv of the membership lists from selected British Trade Associations that are potentially aligned with Oracle's mission.
 
-                For Further information on each data source please select a dataset from the menu below.
+                For Further information on each data source please select a dataset from the menu below. :arrow_down_small:
     """)
     selected_data_source = st.selectbox('Select a data source:', data_sources, index=None)
     with st.spinner('Loading...'):
@@ -990,21 +990,20 @@ def externaldata():
             - Make a legal commitment by changing their corporate governance structure to be accountable to all stakeholders, not just shareholders, and achieve benefit corporation status if available in their jurisdiction.
             - Exhibit transparency by allowing information about their performance measured against B Labs standards to be publicly available on their B Corp profile on B Labs website.
 
-            The data used in the tool consists of scores derived from B Corp Submitted Assessment forms. It broadly covers multiple dimensions of sustainability from environmental stewardship to employee health and well-being.
-                            This means the total score may not always be most reflective of fit/compatibility. We try to use the most appropriate metrics in the tool.
-                            Additionally, the data source includes decertified companies for transparency purposes. We have filtered these out.
+            **The data used in the tool consists of scores derived from B Corp Submitted Assessment forms.** It broadly covers multiple dimensions of sustainability from environmental stewardship to employee health and well-being.
+                            This means the total score may not always be most reflective of fit/compatibility. We try to use the most appropriate metrics to use in the tool instead of focusing too much on the final score.
 
             ##### What Companies are covered?
-            Typically smaller, private companies are B Corp certified although there are exceptions to the rule (Coursera is publicly traded company with a $2bn + market cap).
+            **Typically smaller, private companies are B Corp certified** although there are exceptions to the rule (Coursera is publicly traded company with a $2bn + market cap).
 
-            Many multinationals have B Corp subsidiaries. For example, Danone UK & Evian-Volvic Suisse (Danone), Sanofi Consumer Healthcare North America, Wessanen UK, Pukka & graze (Unilever).
+            **Many multinationals have B Corp subsidiaries.** For example, Danone UK & Evian-Volvic Suisse (Danone), Sanofi Consumer Healthcare North America, Wessanen UK, Pukka & graze (Unilever).
 
             In total, there is a growing community of more than 5,000 Certified B Corps located all around the world and across various industries.
 
             ##### What Data is Available?
-            The B Corp file is data rich. The full data directory including descriptions can be found in the B Corp [Data Directory](https://data.world/blab/b-corp-impact-data/workspace/data-dictionary).
+            **The B Corp file is data rich. The full data directory including descriptions can be found in the B Corp** [Data Directory](https://data.world/blab/b-corp-impact-data/workspace/data-dictionary).
 
-            Our focus is on Employee, Community and Customer Impact including diversity, health and safety, charitable giving etc. Please see Proprietary Data Logic for more information.
+            Our focus is on **Employee, Community and Customer Impact including diversity, health and safety, charitable giving etc.** Please see Proprietary Data Logic for more information.
 
             In the B Lab Data Hierarchy companies are assigned a B Corp Assessment Score. Additionally, Each Impact Area contains a few Impact Topics, and each Impact Topic contains a few questions.
 
@@ -1017,8 +1016,12 @@ def externaldata():
             The source file is ran by a script that is currently ran off this app given memory constraints and to make the app run more efficiently.
 
             ##### How is the data used in the tool?
+            **These datapoints are the building blocks for the Oracle Score and its Components and are used to calculate Scores in any case where a company has a B Corp Certification.**
+
+            Companies without data are not penalised in the tool.
+
             The data in the tool is normalised between 0 and 1 for uniformity. Some datapoints are merged. For example, 3 related diversity based questions are merged into 1 datapoint.
-            These datapoints are the building blocks for the Oracle Score and its Components and are used to calculate Scores in any case where a company has a B Corp Certification.
+
             The B Corp Assessment Scores are available in app. More datapoints are on the way.
 
             To learn more about B Corps, visit [this link](https://bcorporation.net/certification).""")
@@ -1027,16 +1030,16 @@ def externaldata():
                 st.markdown("""
                             #### About Upright Impact
                             Upright is an AI-enabled quantification model to measure the net impact of companies.
-                            The platform contains the largest global open dataset on company impact. It includes full EU taxonomy and SDG alignment datasets, along with proprietary net impact data.
+                            **The platform contains the largest global open dataset on company impact. It includes full EU taxonomy and SDG alignment datasets, along with proprietary net impact data.**
                             It is science based and data driven. Upright models the impact of companies primarily through their products and services.
                             It is granular. For example, two products that have different impacts must be represented as two different products.
-                            The net impact score utilises AI. It is used by over 200+ investors and financial institutions to track impact.
+                            It is used by over 200+ investors and financial institutions to track impact.
 
                             ##### What Companies are covered?
-                            Over 10,000 companies both private and public are covered by Upright. The data is global and covers companies of all sizes and industries. Many of the worlds largest companies are covered.
+                            **Over 10,000 companies both private and public are covered by Upright.** The data is global and covers companies of all sizes and industries. Many of the worlds largest companies are covered.
                             The smallest companies in far off regions are currently filtered out of the tool as are companies that are very unlikely to engage with Oracle. For example Russian or Chinese State Owned companies.
-                            There will be nonetheless still many companies remaining that are unlikely to be a good fit. The tool therefore tends to give low scores to many companies using this dataset.
-                            The tool has access to 7,300+ companies and filters this down to 5,200+ companies for efficient use.
+                            There will be nonetheless still many companies remaining that are unlikely to be a good fit. The tool therefore tends to give low perference to many companies using this dataset.
+                            **The tool has access to 7,300+ companies and filters this down to 5,200+ companies for efficient use.**
 
                             ##### What Data is Available?
                             The data is sourced from the [Upright Impact](https://uprightimpact.com/) platform. We focus on the SDG alignment data and net impact.
@@ -1065,8 +1068,7 @@ def externaldata():
                             More information can be found in the [SDG Alignment](https://docs.uprightplatform.com/methodology/sdg-alignment) section of the platforms documentation.
 
                             ###### Net Impact Ratio
-                            The net impact of a company is the net sum of costs and benefits that the company creates. Costs (i.e. negative impacts) and benefits (i.e. positive impacts) include all types of costs and benefits - including externalities.
-                            Since net impact is a measure of costs and benefits, it can also be referred to as the net value creation of a company.
+                            **The net impact of a company is the net sum of costs and benefits that the company creates**. Costs (i.e. negative impacts) and benefits (i.e. positive impacts) include all types of costs and benefits - including externalities.
 
                             Upright measures net impact in four dimensions: environment, health, society, and knowledge.
                             Examples of costs include e.g. GHG emissions by a car factory, usage of highly-skilled labor by an IT company, and damage to human health caused by sugar-sweetened beverages.
@@ -1078,14 +1080,17 @@ def externaldata():
                             More information can be found in the [Net Impact](https://docs.uprightplatform.com/metrics/net-impact) section of the platforms documentation.
 
                             ##### What is the update frequency for the data source?
-                            AI scraps regularly. However, the reporting that the models are based on are released on an annual basis.
+                            The models AI scrapes the web for data regularly. However, the reporting that the models are based on are released on an annual basis.
                             At the same time, a company's revenue mix does not typically drastically change year over year save exceptional circumstances. The data will therefore give a good approximation beyond the annual cycle.
                             Our source datafile pulls from a .csv file provided for research purposes. This script is currently ran off app given memory constraints and to make the app run more efficiently.
 
                             ##### How is the data used in the tool?
+                            **These datapoints are the building blocks for the Oracle Score and its Components and are used to calculate Scores in any case where a company has Upright data attached to it.**
+
+                            Companies without data are not penalised in the tool.
+
                             SDG data is presented between -100 and +100 in the tool. Net Impact Ratio is normalised between -1 and +1.
 
-                            These datapoints are the building blocks for the Oracle Score and its Components and are used to calculate Scores in any case where a company has Upright data attached to it.
 
                             SDG Alignment Data and Net Impact Data is available to view in app.""")
 
@@ -1093,8 +1098,8 @@ def externaldata():
             with st.container(border= True):
                 st.markdown("""
                 #### About MIT Sloan Lab Culture
-                The Culture 500 model provides a data-based view of company culture within some of the largest and most powerful organizations globally.
-                It is based on research carried out by MIT Sloan School of Business. The model is powered by AI and uses natural language processing to analyze text responses using a dataset of 1.4 million employee reviews from Glassdoor.
+                **The Culture 500 model provides a data-based view of company culture** within some of the largest and most powerful organizations globally.
+                **It is based on research carried out by MIT Sloan School of Business. The model is powered by AI and uses natural language processing to analyze text responses using a dataset of 1.4 million employee reviews from Glassdoor.**
                 The model contains information on nine core aspects of commonly cited drivers of good company culture, termed the Big Nine:""")
                 col1, col2, col3 = st.columns(3,gap = "small")
                 with col1:
@@ -1123,8 +1128,12 @@ def externaldata():
                     We download all data available for all companies in the MIT Sloan Database. Each pillar is available. Please note the lack of coverage compared to B Corp and Upright data.
                     While the data is used to calculate scores, it is not currently displayed in the tool given low coverage so as not to be misleading.
 
+                    ##### What is the update frequency for the data source?
+                    Annual.
+
                     ##### How is the data used in the tool?
                     Data is normalised between 0 and 1 when available. Companies without data are not penalised in the tool.
+
                     Each pillar is used, if available, to complement the core building blocks in creating various components of the Oracle Score.
 
                     To learn more about MIT Sloan Culture, visit [this link](https://sloanreview.mit.edu/culture500).""")
@@ -1133,15 +1142,19 @@ def externaldata():
             with st.container(border= True):
                 st.markdown("""
                             #### About Just Capital
-                            Just Capital is ann independent nonprofit who produce rankings of top US listed companies.
-                            JUST Capital Rankings serve as a scorecard for corporate America, providing unbiased data on how the largest US companies perform on a host of issues.
+                            Just Capital is ann independent nonprofit who produce rankings of US listed companies according to stakeholder related metrics that the public prioritise through a survey.
+                            **JUST Capital Rankings serve as a scorecard for corporate America, providing unbiased data on how the largest US companies perform on a host of issues.**
+
                             The web platform is open and accessible. It includes final ranking and industry adjusted ranking as well the increasingly granular categories and subcategories which make up the final ranking.
-                            In all, there are 20 metrics that constitute a score. Over 200 raw data points make up scores. Data is pulled from robust sources such as ISS, ESG Book and Revelio Labs, Reprisk, all leading data providers.
-                            Data Points are normalized in case of missing data and may be further normalised to account for variations in company size and scale
-                            Sub-categories include:Workers, Customers, Communities, the Environment, Shareholders & Governance
-                            It is a more research focused desk based assessment versus the AI and NLP approach of other datasources
+                            In all, there are 20 metrics that constitute a score. Over 200 raw data points make up scores. **Data is pulled from robust sources such as ISS, ESG Book and Revelio Labs, Reprisk, all leading data providers.**
+                            Data Points are normalized by Just Capital in case of missing data and may be further normalised to account for variations in company size and scale
+
+                            **Sub-categories include: Workers, Customers, Communities, the Environment, Shareholders & Governance**
 
                             The full ranking methodology be found [Here](https://justcapital.com/full-ranking-methodology/)
+
+                            It is a more research focused desk based assessment versus the AI and NLP approach of other datasources
+
 
                             ##### What Companies are covered?
                             Almost 900 companies are covered by the data. The data is however focused on publicly listed US listed companies however most of these operate globally..
@@ -1203,6 +1216,10 @@ def externaldata():
                     """)
 
                 st.markdown("""
+                           ##### What is the update frequency for the data source?
+
+                            Annual.
+
                             ##### How is the data used in the tool?
 
                             Data is normalised between 0 and 1 when available. Companies without data are not penalised in the tool.
@@ -1216,8 +1233,7 @@ def externaldata():
             with st.container(border= True):
                 st.markdown("""
                             ### About Affiliations Data
-                            The Affilations data is webscraped membership data for selected British Trade Associations; namely Business in the Community UK (BIC) and The Association of the British Pharmaceutical Industry (ABPI)
-                            The model contains information on nine core aspects of commonly cited drivers of good company culture, termed the Big Nine:""")
+                            The Affilations data is webscraped membership data for selected British Trade Associations; namely **Business in the Community UK** (BIC) and The **Association of the British Pharmaceutical Industry** (ABPI)""")
                 col1, col2 = st.columns(2,gap = "small")
                 with col1:
                     st.markdown("""
@@ -1243,7 +1259,7 @@ def externaldata():
                     ##### What Companies are covered?
                     These organisations are large and represent a large part of the UK corporate body but private and public.
                     We only include companies with data coverage in one of the core building block datasets.
-                    Typically foreign companies are penalised in our model given they are further away from Oracle and may be less likely to engage. By being a member of a leading British Trade Association a company can signal its presence in the UK
+                    **Typically foreign companies are penalised in our model given they are further away from Oracle and may be less likely to engage. By being a member of a leading British Trade Association a company can signal its presence in the UK.**
 
                     ##### What data is available?
                     Data on membership for both ABPI and BIC if they are assessed against one of our core building blocks datasets.
@@ -1252,7 +1268,14 @@ def externaldata():
 
                     ##### How is the data used in the tool?
                     Under certain sub components of Oracle Score a company will receive points if it is a member of either of these trade association.
+
                     Companies that aren't members are not penalised in the tool.
-                    This dataset is a to complement the core building blocks in creating various components of the Oracle Score.""")
+
+                    This dataset is used to complement the core building blocks in creating various components of the Oracle Score.""")
 
     st.write(' *Just Capital Data is limited to a select number of datapoints. Select in dropdown for details.')
+
+def propdata():
+    st.markdown(""" :soon: :sleuth_or_spy:
+
+                Please Note this is a work in progress. Aiming to get it done by first week in March""")
