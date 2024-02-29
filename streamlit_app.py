@@ -6,7 +6,7 @@ import plotly.express as px
 from streamlit_echarts import st_echarts
 from streamlit_option_menu import option_menu
 from streamlit_server_state import server_state, server_state_lock
-from utils import intro_page, create_filters, get_filtered_data, format_dataframe, display_columns, calculate_stats, bullet, SDG_Impact_Alignment, selected_score, create_radar_chart, create_strip_plot, generate_chart, create_company_selectbox, create_gauge_options, sdg_expander, find_closest_match, plot_choropleth
+from utils import intro_page, externaldata, create_filters, get_filtered_data, format_dataframe, display_columns, calculate_stats, bullet, SDG_Impact_Alignment, selected_score, create_radar_chart, create_strip_plot, generate_chart, create_company_selectbox, create_gauge_options, sdg_expander, find_closest_match, plot_choropleth
 from st_aggrid import GridOptionsBuilder, AgGrid
 from st_aggrid.shared import GridUpdateMode, DataReturnMode
 
@@ -291,7 +291,7 @@ menu = {
                 'title': None,
                 'items': { 
                     'Introduction' : {'action': intro_page, 'item_icon': 'journal-richtext', 'submenu': None},
-                    '3rd Party Data Used' : {'action': sdg_expander, 'item_icon': 'database-dash', 'submenu': None},
+                    '3rd Party Data Used' : {'action': externaldata, 'item_icon': 'database-dash', 'submenu': None},
                     'Proprietary Data Logic' : {'action': "", 'item_icon': 'database-check', 'submenu': None},
                 },
                 'menu_icon': 'filter-circle',

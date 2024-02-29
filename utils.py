@@ -624,4 +624,311 @@ def intro_page():
                 'Lastly, users are shown a visual of company contribution to SDGs.' 
                 'This page is useful for understanding why a Company is rated as they are, what they might have in common with Oracle and is a launchpad to further research. \n\n')
 
+def externaldata():
+    st.subheader('Third Party Data Used in the Tool')
+    data_sources = ["B Corp Impact Assessments", "Upright Impact", "MIT Sloan Lab Culture", "Just Capital", "Affiliations"]
+    st.markdown("""
+    The app uses a variety of publicly available sources, namely:""")
+    col1, col2 = st.columns([1,4.5])
+    with col1:
+        st.markdown("""
+        - B Corp Impact Assessments
+        - Upright Impact
+        - MIT Sloan Lab Culture
+        """)
+    with col2:
+        st.markdown("""
+    - Just Capital*
+    - Affiliations""")
 
+    st.markdown("""
+                The **B Corp Impact Assessments** and **Upright Impact** datasets have good coverage and are used as the core building blocks for the Oracle Score and its components.
+
+                These core datasets also contain qualitative data beyond scoring data such as where the company operates, its industry, employee numbers, websites and a brief description.
+                
+                The remaiing datasets, **MIT Sloan Lab Culture** and **Just Capital** provide interesting information but are limited in coverage. They are used to provide additional context to the Oracle Score and its components when data is available.
+
+                Lastly, **Affiliations** dataset is a webscraped.csv of the membership lists from selected British Trade Associations that are potentially aligned with Oracle's mission. 
+                
+                For Further information on each data source please select a dataset from the menu below.
+    """)
+    selected_data_source = st.selectbox('Select a data source:', data_sources, index=None)
+    with st.spinner('Loading...'):
+        if selected_data_source == 'B Corp Impact Assessments':  
+            with st.container(border= True):
+                st.markdown("""
+            #### About B Corp Impact Assessments
+            B Corp Certification is a designation that a business is meeting high standards of verified performance, accountability, and transparency on factors from community relations to employee benefits and charitable giving to supply chain practices and input materials.
+
+            In order to achieve certification, a company must:
+            - Demonstrate high social and environmental performance by achieving a B Impact Assessment score of 80 or above and passing a risk review. Multinational corporations must also meet baseline requirement standards.
+            - Make a legal commitment by changing their corporate governance structure to be accountable to all stakeholders, not just shareholders, and achieve benefit corporation status if available in their jurisdiction.
+            - Exhibit transparency by allowing information about their performance measured against B Labs standards to be publicly available on their B Corp profile on B Labs website.
+
+            The data used in the tool consists of scores derived from B Corp Submitted Assessment forms. It broadly covers multiple dimensions of sustainability from environmental stewardship to employee health and well-being.
+                            This means the total score may not always be most reflective of fit/compatibility. We try to use the most appropriate metrics in the tool.
+                            Additionally, the data source includes decertified companies for transparency purposes. We have filtered these out.
+
+            ##### What Companies are covered?
+            Typically smaller, private companies are B Corp certified although there are exceptions to the rule (Coursera is publicly traded company with a $2bn + market cap).
+                            
+            Many multinationals have B Corp subsidiaries. For example, Danone UK & Evian-Volvic Suisse (Danone), Sanofi Consumer Healthcare North America, Wessanen UK, Pukka & graze (Unilever).
+
+            In total, there is a growing community of more than 5,000 Certified B Corps located all around the world and across various industries.
+
+            ##### What Data is Available?
+            The B Corp file is data rich. The full data directory including descriptions can be found in the B Corp [Data Directory](https://data.world/blab/b-corp-impact-data/workspace/data-dictionary).
+            
+            Our focus is on Employee, Community and Customer Impact including diversity, health and safety, charitable giving etc. Please see Proprietary Data Logic for more information.
+            
+            In the B Lab Data Hierarchy companies are assigned a B Corp Assessment Score. Additionally, Each Impact Area contains a few Impact Topics, and each Impact Topic contains a few questions.
+            
+            While B Corp cannot release company answers to questions, they have provided the research community with the scores within topics and areas. This website has information on the categories the columns refer to: [http://b-analytics.net/content/standards-navigator](http://b-analytics.net/content/standards-navigator).
+            
+            Full data can be found [here](https://data.world/blab).
+
+            ##### What is the update frequency for the data source?
+            Quarterly updates. Companies report annually.
+            The source file is ran by a script that is currently ran off this app given memory constraints and to make the app run more efficiently.
+            
+            ##### How is the data used in the tool?
+            The data in the tool is normalised between 0 and 1 for uniformity. Some datapoints are merged. For example, 3 related diversity based questions are merged into 1 datapoint. 
+            These datapoints are the building blocks for the Oracle Score and its Components and are used to calculate Scores in any case where a company has a B Corp Certification.
+            The B Corp Assessment Scores are available in app. More datapoints are on the way.
+            
+            To learn more about B Corps, visit [this link](https://bcorporation.net/certification).""")
+        if selected_data_source == 'Upright Impact':   
+            with st.container(border= True):
+                st.markdown(""" 
+                            #### About Upright Impact
+                            Upright is an AI-enabled quantification model to measure the net impact of companies. 
+                            The platform contains the largest global open dataset on company impact. It includes full EU taxonomy and SDG alignment datasets, along with proprietary net impact data.
+                            It is science based and data driven. Upright models the impact of companies primarily through their products and services.
+                            It is granular. For example, two products that have different impacts must be represented as two different products. 
+                            The net impact score utilises AI. It is used by over 200+ investors and financial institutions to track impact.
+                            
+                            ##### What Companies are covered?
+                            Over 10,000 companies both private and public are covered by Upright. The data is global and covers companies of all sizes and industries. Many of the worlds largest companies are covered.
+                            The smallest companies in far off regions are currently filtered out of the tool as are companies that are very unlikely to engage with Oracle. For example Russian or Chinese State Owned companies.
+                            There will be nonetheless still many companies remaining that are unlikely to be a good fit. The tool therefore tends to give low scores to many companies using this dataset.
+                            The tool has access to 7,300+ companies and filters this down to 5,200+ companies for efficient use.
+
+                            ##### What Data is Available?
+                            The data is sourced from the [Upright Impact](https://uprightimpact.com/) platform. We focus on the SDG alignment data and net impact.
+                             
+                            ###### SDG Metrics
+                            The SDG metrics in this tool include data on both **SDG alignment** (positive impacts) and **SDG misalignment** (negative impacts). 
+                            This is based on an assessment of products and services the company derives revenue from.
+                            A product or service can align with more than one SDG and is deemed Strongly, Moderately, or Weakly Aligned/Misaligned.                           
+                            """)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("""
+                            ###### Step 1: The alignment for each SDG is calculated as follows:
+                            - Strongly aligned products have a clear direct impact on the SDG.
+                            - Moderately aligned products have a lesser direct impact.
+                            - Weakly aligned products have an indirect impact.""")
+                with col2:
+                    st.markdown("""           
+                            ###### Step 2: The Revenue share for each SDG is calculated as follows:
+                            - Revenue from products that are strongly (mis)aligned with SDG X +
+                            - Revenue from products that are moderately (mis)aligned with SDG X * 0.5 +
+                            - Revenue from products that are weakly (mis)aligned with SDG X * 0.25""")
+                st.markdown(r"""
+                            
+                            More information can be found in the [SDG Alignment](https://docs.uprightplatform.com/methodology/sdg-alignment) section of the platforms documentation.
+                            
+                            ###### Net Impact Ratio
+                            The net impact of a company is the net sum of costs and benefits that the company creates. Costs (i.e. negative impacts) and benefits (i.e. positive impacts) include all types of costs and benefits - including externalities. 
+                            Since net impact is a measure of costs and benefits, it can also be referred to as the net value creation of a company.
+                            
+                            Upright measures net impact in four dimensions: environment, health, society, and knowledge. 
+                            Examples of costs include e.g. GHG emissions by a car factory, usage of highly-skilled labor by an IT company, and damage to human health caused by sugar-sweetened beverages. 
+                            Examples of benefits include e.g. improvements in health caused by a cancer medicine, knowledge created by research equipment, and pollution removed by a catalytic converter.
+
+                            Net impact ratio is inspired by the net profit ratio. it is derived using the following formula: Net Impact Ratio = $\frac{Total Positive Impact - Total Negative Impact}{100}$
+                            
+          
+                            More information can be found in the [Net Impact](https://docs.uprightplatform.com/metrics/net-impact) section of the platforms documentation.
+
+                            ##### What is the update frequency for the data source?
+                            AI scraps regularly. However, the reporting that the models are based on are released on an annual basis.
+                            At the same time, a company's revenue mix does not typically drastically change year over year save exceptional circumstances. The data will therefore give a good approximation beyond the annual cycle.
+                            Our source datafile pulls from a .csv file provided for research purposes. This script is currently ran off app given memory constraints and to make the app run more efficiently.
+                            
+                            ##### How is the data used in the tool?
+                            SDG data is presented between -100 and +100 in the tool. Net Impact Ratio is normalised between -1 and +1.
+                            
+                            These datapoints are the building blocks for the Oracle Score and its Components and are used to calculate Scores in any case where a company has Upright data attached to it.
+                            
+                            SDG Alignment Data and Net Impact Data is available to view in app.""")
+                
+        if selected_data_source == 'MIT Sloan Lab Culture':   
+            with st.container(border= True):
+                st.markdown("""
+                #### About MIT Sloan Lab Culture
+                The Culture 500 model provides a data-based view of company culture within some of the largest and most powerful organizations globally. 
+                It is based on research carried out by MIT Sloan School of Business. The model is powered by AI and uses natural language processing to analyze text responses using a dataset of 1.4 million employee reviews from Glassdoor.
+                The model contains information on nine core aspects of commonly cited drivers of good company culture, termed the Big Nine:""")
+                col1, col2, col3 = st.columns(3,gap = "small")
+                with col1:
+                    st.markdown(""" 
+                    - Agility
+                    - Collaboration
+                    - Customer""")
+                with col2:
+                    st.markdown("""
+                    - Diversity
+                    - Execution                                
+                    - Innovation""")
+                with col3:
+                    st.markdown("""
+                    - Integrity
+                    - Performance
+                    - Respect""")
+                st.markdown("""
+                    To learn more about these datapoints and why they are chosen see [here](https://sloanreview.mit.edu/culture500/research)    
+                    
+                    ##### What Companies are covered?
+                    600 companies are covered by the model. The data primarily covers American companies or large global companies. It covers both private and public companies.
+                    Non profits, foundations and hospitals are currently filtered out of the tool. These were by in large all US based anyway.
+                    
+                    ##### What data is available?
+                    We download all data available for all companies in the MIT Sloan Database. Each pillar is available. Please note the lack of coverage compared to B Corp and Upright data.
+                    While the data is used to calculate scores, it is not currently displayed in the tool given low coverage so as not to be misleading.
+                                
+                    ##### How is the data used in the tool?
+                    Data is normalised between 0 and 1 when available. Companies without data are not penalised in the tool. 
+                    Each pillar is used, if available, to complement the core building blocks in creating various components of the Oracle Score.
+                    
+                    To learn more about MIT Sloan Culture, visit [this link](https://sloanreview.mit.edu/culture500).""")
+
+        if selected_data_source == 'Just Capital':   
+            with st.container(border= True):
+                st.markdown("""
+                            #### About Just Capital
+                            Just Capital is ann independent nonprofit who produce rankings of top US listed companies.
+                            JUST Capital Rankings serve as a scorecard for corporate America, providing unbiased data on how the largest US companies perform on a host of issues.
+                            The web platform is open and accessible. It includes final ranking and industry adjusted ranking as well the increasingly granular categories and subcategories which make up the final ranking.
+                            In all, there are 20 metrics that constitute a score. Over 200 raw data points make up scores. Data is pulled from robust sources such as ISS, ESG Book and Revelio Labs, Reprisk, all leading data providers.
+                            Data Points are normalized in case of missing data and may be further normalised to account for variations in company size and scale
+                            Sub-categories include:Workers, Customers, Communities, the Environment, Shareholders & Governance
+                            It is a more research focused desk based assessment versus the AI and NLP approach of other datasources
+                            
+                            The full ranking methodology be found [Here](https://justcapital.com/full-ranking-methodology/)
+
+                            ##### What Companies are covered?
+                            Almost 900 companies are covered by the data. The data is however focused on publicly listed US listed companies however most of these operate globally..
+
+                            ##### What Data is Available?
+                            Given the US focus only select data is chosen that are considered useful for refining a company's score.
+                            In calculating Oracle Scores we selected the following data points:""")
+                col1, col2, col3 = st.columns(3,gap = "small")
+                with col1:
+                    st.markdown("""   
+                    **Customers Rank**
+                                
+                    The Customers Stakeholder considers a company performance on factors related to how it treats and respects its customers, including 
+                    - Protecting customer privacy 
+                    - Treating customers fairly
+                    - Communicating transparently
+                    - Making beneficial products
+                    
+
+                    **Overall Rank**
+                                
+                    Weighted Score of the Ranks
+                    """)
+                with col2:
+                    st.markdown("""
+                    **Workers Rank**
+                                
+                    The Workers Stakeholder considers a company performance on factors related to how it treats and invests in its employees, including:
+                    - Pay a fair, living wage
+                    - Supporting workforce retention, advancement, and training
+                    - Providing benefits and work-life balance
+                    - Protecting worker health and safety
+                    - Cultivating a diverse, inclusive workplace
+                    
+
+                    **Philantropy Metric**
+                    
+                    Gives back to local communities through donations and employee volunteering. Assessed using data from ESG Bookincluding:
+                    An assessment of whether a company discloses that they have a program to match employee donations to external charitys. Includes in-kind, and value of employee volunteering hours. 
+                    An assessment of the company's disclosed monetary contributions to charitable giving in 2021 and its ratio to company pre tax profits.
+                    An assessment of whether the company offers an official volunteering program.                            
+
+
+                    """)
+                with col3:
+                    st.markdown("""
+                     **Communities Rank**
+                                
+                    The Communities Stakeholder considers a company performance on factors related to how it interacts with and supports the communities it most impacts, including 
+                    - Creating jobs
+                    - Addressing human rights issues in the supply chain
+                    - Contributing to community development
+                    - Giving back to local communities.                                
+                   
+                     **Community Development Metric**
+                        
+                    Contributes to community development by supporting local education and other community programs. Assesed including:
+                    Assesses if a company donates to educational programs including primary and secondary schools, affordable housing
+                    Considers controversies occurring globally that pertain to community relations and negative impacts on communities in past 3 years 
+                           """)
+                    
+            st.markdown("""**Note** that we have access to the metric not the underlying assessments.
+                        
+                        While the data is used to calculate scores it is not currently displayed in the tool given low coverage so as not to be misleading.
+                        
+                        ##### How is the data used in the tool?
+                        Data is normalised between 0 and 1 when available. Companies without data are not penalised in the tool. 
+                        Each pillar is used, if available, to complement the core building blocks in creating various components of the Oracle Score.
+
+                        To learn more about Just Capital, visit [this link](https://justcapital.com/).""")
+            
+        if selected_data_source == 'Affiliations':                   
+            with st.container(border= True):
+                st.markdown("""
+                            ### About Affiliations Data
+                            The Affilations data is webscraped membership data for selected British Trade Associations; namely Business in the Community UK (BIC) and The Association of the British Pharmaceutical Industry (ABPI)
+                            The model contains information on nine core aspects of commonly cited drivers of good company culture, termed the Big Nine:""")
+                col1, col2 = st.columns(2,gap = "small")
+                with col1:
+                    st.markdown(""" 
+                                **Business in the Community UK**
+
+                                Business in the Community UK is the largest and most influential responsible business network in the UK. iT'S A business-community outreach charity promoting responsible business and CSR.
+                                Membership involves a commitment to responsible business practices and contributing to the community.
+                                There are broad diversity of members private and public including many international companies with a British presence.
+                                For more information on BIC, visit [Here](https://www.bitc.org.uk/)
+                                """)
+                with col2:
+                    st.markdown(""" 
+                                **Association of the British Pharmaceutical Industry**
+                                
+                                The ABPI is a trade association representing research based biopharmaceutical companies in the UK.
+                                Membership of the ABPI is open to companies producing prescription medicines (Full membership), other organisations involved in pharmaceutical research and development (Research Affiliate membership), 
+                                and those with an interest in the pharmaceutical industry that operate in the UK (General Affiliate membership). Members may be international but must operate in the UK. 
+                                There are many non pharma companies present in the trade body. This might show a corproate interest in healthcare and pharma industry.
+                                For more information on ABPI, visit [Here](https://www.abpi.org.uk/)
+                                """)                              
+
+                st.markdown("""                    
+                    ##### What Companies are covered?
+                    These organisations are large and represent a large part of the UK corporate body but private and public. 
+                    We only include companies with data coverage in one of the core building block datasets.
+                    Typically foreign companies are penalised in our model given they are further away from Oracle and may be less likely to engage. By being a member of a leading British Trade Association a company can signal its presence in the UK
+                    
+                    ##### What data is available?
+                    Data on membership for both ABPI and BIC if they are assessed against one of our core building blocks datasets. 
+                    For ABPI we show full members and affiliate members. While the data is used to calculate scores.
+                    ABPI membership is currently displayed in the tool as it may provide interesting insight.
+                                
+                    ##### How is the data used in the tool?
+                    Under certain sub components of Oracle Score a company will receive points if it is a member of either of these trade association. 
+                    Companies that aren't members are not penalised in the tool. 
+                    This dataset is a to complement the core building blocks in creating various components of the Oracle Score.""")
+                    
+    st.write(' *Just Capital Data is limited to a select number of datapoints. Select in dropdown for details.')
