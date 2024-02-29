@@ -949,7 +949,7 @@ def intro_page():
             "Lastly, users are shown a visual of company contribution to SDGs."
             "This page is useful for understanding why a Company is rated as they are, what they might have in common with Oracle and is a launchpad to further research. \n\n"
         )
-  def externaldata():
+def externaldata():
     st.subheader('Third Party Data Used in the Tool')
     data_sources = ["B Corp Impact Assessments", "Upright Impact", "MIT Sloan Lab Culture", "Just Capital", "Affiliations"]
     st.markdown("""
@@ -963,8 +963,8 @@ def intro_page():
         """)
     with col2:
         st.markdown("""
-    - Just Capital*
-    - Affiliations""")
+        - Just Capital*
+        - Affiliations""")
 
     st.markdown("""
                 The **B Corp Impact Assessments** and **Upright Impact** datasets have good coverage and are used as the core building blocks for the Oracle Score and its components.
@@ -1188,20 +1188,19 @@ def intro_page():
                     """)
                 with col3:
                     st.markdown("""
-                     **Communities Rank**
+                    **Community Development Metric**
 
-                    The Communities Stakeholder considers a company performance on factors related to how it interacts with and supports the communities it most impacts, including
-                    - Creating jobs
-                    - Addressing human rights issues in the supply chain
-                    - Contributing to community development
-                    - Giving back to local communities.
+                    Contributes to community development by supporting local education and other community programs. Assessed including:
+                    - Assesses if a company donates to educational programs including primary and secondary schools, affordable housing
+                    - Considers controversies occurring globally that pertain to community relations and negative impacts on communities in past 3 years
 
-                     **Community Development Metric**
+                    **Philanthropy Metric**
 
-                    Contributes to community development by supporting local education and other community programs. Assesed including:
-                    Assesses if a company donates to educational programs including primary and secondary schools, affordable housing
-                    Considers controversies occurring globally that pertain to community relations and negative impacts on communities in past 3 years
-                           """)
+                    Gives back to local communities through donations and employee volunteering. Assessed using data from ESG Book including:
+                    - An assessment of whether a company discloses that they have a program to match employee donations to external charities. Includes in-kind, and value of employee volunteering hours.
+                    - An assessment of the company's disclosed monetary contributions to charitable giving in 2021 and its ratio to company pre-tax profits.
+                    - An assessment of whether the company offers an official volunteering program.
+                    """)
 
                 st.markdown("""
                             ##### How is the data used in the tool?
