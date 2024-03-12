@@ -16,7 +16,8 @@
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
-				
+				"ms-toolsai.jupyter",
+				"ms-toolsai.datawrangler",
 				"eamodio.gitlens",
 				"mhutchie.git-graph",
 				"ms-python.flake8",
