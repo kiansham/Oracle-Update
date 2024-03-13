@@ -356,6 +356,8 @@ def format_data(df: pd.DataFrame | pl.DataFrame) -> pd.DataFrame | pl.DataFrame:
                     .reshape(-1, 1)
                 )  # type: ignore
 
+        return df
+
 
 def process_data(as_polars=False) -> pd.DataFrame | pl.DataFrame:
     df = load_data(as_polars=as_polars)
