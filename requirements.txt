@@ -8,7 +8,6 @@ langcodes==3.3.0
 Levenshtein==0.23.0
 markdown-it-py==3.0.0
 markdownlit==0.0.7
-numpy==1.26.1
 pandas==2.1.2
 pandocfilters==1.5.0
 plotly==5.18.0
@@ -34,6 +33,6 @@ streamlit-server-state==0.17.1
 streamlit-shadcn-ui==0.1.18
 streamlit-toggle-switch==1.0.2
 streamviz==5.1
-datadotworld[pandas]~=1.8.5
+datadotworld~=1.8.5
 polars~=0.20
 scikit-learn~=1.4.1
