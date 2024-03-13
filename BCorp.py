@@ -1,6 +1,5 @@
 import os
 import datadotworld as dw
-from numpy import matrix
 import pandas as pd
 import polars as pl
 from sklearn.preprocessing import MinMaxScaler
