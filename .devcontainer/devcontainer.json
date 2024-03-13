@@ -22,7 +22,7 @@
 				"mhutchie.git-graph",
 				"ms-python.flake8",
 				"ms-python.black-formatter",
-				"github.copilot",
+				"kevinrose.vsc-python-indent",
 				"github.copilot"
 			]
 		}
@@ -32,5 +32,5 @@
 	// "remoteUser": "root"
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements.txt"
+	"postCreateCommand": "pip3 install -U pip setuptools wheel && pip3 install --user -r requirements.txt"
 }
