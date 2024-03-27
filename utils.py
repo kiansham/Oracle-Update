@@ -1278,4 +1278,19 @@ def externaldata():
 def propdata():
     st.markdown(""" :soon: :sleuth_or_spy:
 
-                Please Note this is a work in progress. Aiming to get it done by first week in March""")
+                Please Note this is a work in progress. Aiming to get it done by first week in April""")
+
+
+
+def changelog():
+    st.subheader("Oracle Tool: Changelog")
+
+    st.write("""**What's new then?**""")
+    st.markdown("""
+                **v0.1.0** - 2023: First version :hatching_chick:. Added basic functionality.""")
+
+    st.markdown("""**v0.1.1** - Feb 2024: Upddate :hatched_chick:. Added additional information and refreshed look.""")
+
+    st.markdown("""            **v0.1.2** - March 2024: Update :link:. Linked to B Corp Database for Continous updates on B Corp Data. Added 1000s more B Corp Companies.
+
+                """)

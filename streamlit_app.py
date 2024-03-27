@@ -18,6 +18,7 @@ st.set_page_config(
 
 from utils import (
     intro_page,
+    changelog,
     externaldata,
     propdata,
     create_filters,
@@ -32,7 +33,6 @@ from utils import (
     generate_chart,
     create_company_selectbox,
     create_gauge_options,
-    sdg_expander,
     find_closest_match,
     plot_choropleth,
 )
@@ -533,6 +533,11 @@ menu = {
                     "Proprietary Data Logic": {
                         "action": propdata,
                         "item_icon": "database-check",
+                        "submenu": None,
+                    },
+                    "Change Log": {
+                        "action": changelog,
+                        "item_icon": "pass",
                         "submenu": None,
                     },
                 },
