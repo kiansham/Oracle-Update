@@ -647,10 +647,10 @@ df['Oracle Score'] = df.apply(calculate_oracle_score, axis=1)
 df['PrivPub'] = 'Private'
 columns_to_drop2 = ["size_score","industry_score","country"]
 df = df.drop(columns=[col for col in columns_to_drop2 if col in df.columns])
-rename_dict2 = {"size": "Employees", "website": "Website","city": "City","description": "Description", 'PrivPub': 'Public or Private'}
+rename_dict2 = {"size": "Employees (Estimate)", "website": "Website","city": "City","description": "Description", 'PrivPub': 'Public or Private'}
 df = df.rename(columns=rename_dict2)
 df['B Corp'] = 1
-background_cols = ['Company', 'B Corp', 'Public or Private', 'Industry', 'Region', 'Country', 'City', 'Employees', 'Description', 'Website', 'B Corp Webpage','First Certified as B Corp']
+background_cols = ['Company', 'B Corp', 'Public or Private', 'Industry', 'Region', 'Country', 'City', 'Employees (Estimate)', 'Description', 'Website', 'B Corp Webpage','First Certified as B Corp']
 score_cols0 = ['Culture Score', 'Capacity Score', 'Conduct Score', 'Collaboration Score', 'Oracle Score','Culture Score Normalized', 'Capacity Score Normalized', 'Conduct Score Normalized', 'Collaboration Score Normalized','B Corp Impact - Overall Score', 'B Corp Impact - Community', 'B Corp Impact - Customers', 'B Corp Impact - Environment', 'B Corp Impact - Governance', 'B Corp Impact - Workers', 'Size Score', 'Industry Score', 'B Corp Impact - Customers Customer Stewardship','B Corp Impact - Governance Mission Locked','B Corp Impact - Governance Mission Engagement', 'B Corp Impact - Community Civic Engagement Giving', 'B Corp Impact - Community Supply Chain Management', 'B Corp Impact - Environment Water', 'B Corp Impact - Environment Land Life', 'B Corp Impact - Environment Air Climate' ]
 all_cols = list(df.columns)
 score_cols1 = [col for col in all_cols if col not in background_cols + score_cols0]
@@ -667,7 +667,7 @@ def categorize_by_size(size):
         return 'Medium'
      else:
         return 'Unknown'
-df['Company Size'] = df['Employees'].apply(categorize_by_size)
+df['Company Size'] = df['Employees (Estimate)'].apply(categorize_by_size)
 
 ##new dataframe for Public
 df2 = pd.read_csv('Oraclesdgin.csv')
@@ -682,11 +682,11 @@ def clean_dataframe(dataframe):
 # Clean both dataframes
 df2 = clean_dataframe(df2)
 df2.rename(columns={'Privpub': 'Public or Private'}, inplace=True)
-df2.rename(columns={'Employees (Demandbase Estimate)': 'Employees'}, inplace=True)
+df2.rename(columns={'Employees (Demandbase Estimate)': 'Employees (Estimate)'}, inplace=True)
 df2.drop(columns=['Isin', 'Duplicate Isin', 'Region', 'Geography'], inplace=True)
 df2.rename(columns={'Continent': 'Region'}, inplace=True)
 merged_df = pd.merge(df, df2,
-                     on=['Company', 'Country', 'Description', 'Company Size','Website', 'Employees', 'Industry',
+                     on=['Company', 'Country', 'Description', 'Company Size','Website', 'Employees (Estimate)', 'Industry',
                          'Public or Private', 'Industry Score', 'Size Score', 'Culture Score',
                          'Capacity Score', 'Conduct Score', 'Collaboration Score',
                          'Culture Score Normalized', 'Capacity Score Normalized',
@@ -710,3 +710,4 @@ for column in columns_to_transform:
     merged_df[column] = merged_df[column].apply(lambda x: 'Yes' if x == 1 else 'No')
 
 st.dataframe(merged_df, hide_index = True)
+merged_df.to_csv('combined.csv', index=False)
